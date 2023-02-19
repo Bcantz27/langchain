@@ -10,6 +10,7 @@ from langchain.agents.conversational.base import ConversationalAgent
 from langchain.agents.mrkl.base import ZeroShotAgent
 from langchain.agents.react.base import ReActDocstoreAgent
 from langchain.agents.self_ask_with_search.base import SelfAskWithSearchAgent
+from langchain.agents.virtual_assistant.base import VirtualAssistant
 from langchain.agents.tools import Tool
 from langchain.chains.loading import load_chain, load_chain_from_config
 from langchain.llms.base import BaseLLM
@@ -20,6 +21,7 @@ AGENT_TO_CLASS = {
     "react-docstore": ReActDocstoreAgent,
     "self-ask-with-search": SelfAskWithSearchAgent,
     "conversational-react-description": ConversationalAgent,
+    "virtual-assistant": VirtualAssistant,
 }
 
 URL_BASE = "https://raw.githubusercontent.com/hwchase17/langchain-hub/master/agents/"

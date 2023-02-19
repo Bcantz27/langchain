@@ -8,6 +8,8 @@ from langchain.utilities.google_search import GoogleSearchAPIWrapper
 from langchain.utilities.google_serper import GoogleSerperAPIWrapper
 from langchain.utilities.searx_search import SearxSearchWrapper
 from langchain.utilities.wolfram_alpha import WolframAlphaAPIWrapper
+from langchain.utilities.personal_convo import PersonalConvo
+from langchain.utilities.document_search import DocumentSearch
 
 __all__ = [
     "BashProcess",
@@ -19,4 +21,6 @@ __all__ = [
     "SerpAPIWrapper",
     "SearxSearchWrapper",
     "BingSearchAPIWrapper",
+    "DocumentSearch",
+    "PersonalConvo",
 ]
