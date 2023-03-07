@@ -56,12 +56,9 @@ class VirtualAssistant(Agent):
     def create_prompt(
         cls,
         tools: List[Tool],
-        chat_history: List[str] = [],
         ai_name: str = "Assistant",
         ai_desc: str = "Assistant is a large language model",
-        human_name: str = "Human",
-        prefix: str = PREFIX,
-        suffix: str = SUFFIX,
+        chat_history: List[str] = [],
         input_variables: Optional[List[str]] = None,
     ) -> PromptTemplate:
         """Create prompt in the style of the zero shot agent.
@@ -79,12 +76,13 @@ class VirtualAssistant(Agent):
         tool_strings = "\n".join([f"{tool.name}: {tool.description}" for tool in tools])
         tool_names = ", ".join([tool.name for tool in tools])
         format_instructions = FORMAT_INSTRUCTIONS.format(tool_names=tool_names)
+        prefix = PREFIX.format(ai_name=ai_name, ai_desc=ai_desc)
         history = ""
+        chat_history.reverse()
         if len(chat_history) > 0: 
-            history = "Current conversation:"
-        for chat in chat_history:
-            history += chat + '\n\n'
-        prefix = PREFIX.format(ai_name=ai_name, ai_desc=ai_desc,history=history, human_name=human_name)
+            for chat in chat_history[:5]:
+                history += chat + '\n'
+        suffix = SUFFIX.format(chat_history=history,input="{input}",agent_scratchpad="{agent_scratchpad}")
         template = "\n\n".join([prefix, tool_strings, format_instructions, suffix])
         if input_variables is None:
             input_variables = ["input", "agent_scratchpad"]
@@ -95,13 +93,10 @@ class VirtualAssistant(Agent):
         cls,
         llm: BaseLLM,
         tools: List[Tool],
-        chat_history: List[str] = [],
         ai_name: str = "Assistant",
         ai_desc: str = "Assistant is a large language model",
-        human_name: str = "Human",
+        chat_history: List[str] = [],
         callback_manager: Optional[BaseCallbackManager] = None,
-        prefix: str = PREFIX,
-        suffix: str = SUFFIX,
         input_variables: Optional[List[str]] = None,
         **kwargs: Any,
     ) -> Agent:
@@ -109,13 +104,10 @@ class VirtualAssistant(Agent):
         cls._validate_tools(tools)
         prompt = cls.create_prompt(
             tools,
-            prefix=prefix,
-            suffix=suffix,
             input_variables=input_variables,
-            chat_history=chat_history,
             ai_name=ai_name,
             ai_desc=ai_desc,
-            human_name=human_name,
+            chat_history=chat_history,
         )
         print(prompt)
         llm_chain = LLMChain(

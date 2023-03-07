@@ -40,7 +40,10 @@ class InvalidTool(BaseTool):
 
     def _run(self, tool_name: str) -> str:
         """Use the tool."""
-        return f"{tool_name} is not a valid tool, try another one."
+        if tool_name in ["None","N/A"]:
+            return f"I dont need to use a tool, I should generate a final answer based off what I aready know"
+        else:
+            return f"{tool_name} is not a valid tool, try another one."
 
     async def _arun(self, tool_name: str) -> str:
         """Use the tool asynchronously."""

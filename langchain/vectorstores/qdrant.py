@@ -35,7 +35,7 @@ class Qdrant(VectorStore):
         except ImportError:
             raise ValueError(
                 "Could not import qdrant-client python package. "
-                "Please it install it with `pip install qdrant-client`."
+                "Please install it with `pip install qdrant-client`."
             )
 
         if not isinstance(client, qdrant_client.QdrantClient):
@@ -49,7 +49,10 @@ class Qdrant(VectorStore):
         self.embedding_function = embedding_function
 
     def add_texts(
-        self, texts: Iterable[str], metadatas: Optional[List[dict]] = None
+        self,
+        texts: Iterable[str],
+        metadatas: Optional[List[dict]] = None,
+        **kwargs: Any,
     ) -> List[str]:
         """Run more texts through the embeddings and add to the vectorstore.
 
@@ -174,7 +177,7 @@ class Qdrant(VectorStore):
         except ImportError:
             raise ValueError(
                 "Could not import qdrant-client python package. "
-                "Please it install it with `pip install qdrant-client`."
+                "Please install it with `pip install qdrant-client`."
             )
 
         from qdrant_client.http import models as rest

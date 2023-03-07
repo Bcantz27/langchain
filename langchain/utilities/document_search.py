@@ -7,7 +7,7 @@ class DocumentSearch:
 
     def run(self, query: str) -> str:
         docs = self.vectorstore.similarity_search(query, self.number_of_documents)
-        content = 'The following relavent documents were found.\n\n'
+        content = ''
         for doc in docs:
             content += doc.page_content + '\n\n'
         return content

@@ -1,13 +1,12 @@
 """Base implementation for tools or skills."""
 
 from abc import abstractmethod
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, Extra, Field, validator
 
 from langchain.callbacks import get_callback_manager
 from langchain.callbacks.base import BaseCallbackManager
-from langchain.schema import AgentAction
 
 
 class BaseTool(BaseModel):
@@ -45,12 +44,11 @@ class BaseTool(BaseModel):
 
     def __call__(self, tool_input: str) -> str:
         """Make tools callable with str input."""
-        agent_action = AgentAction(tool_input=tool_input, tool=self.name, log="")
-        return self.run(agent_action)
+        return self.run(tool_input)
 
     def run(
         self,
-        action: AgentAction,
+        tool_input: str,
         verbose: Optional[bool] = None,
         start_color: Optional[str] = "green",
         color: Optional[str] = "green",
@@ -61,13 +59,13 @@ class BaseTool(BaseModel):
             verbose = self.verbose
         self.callback_manager.on_tool_start(
             {"name": self.name, "description": self.description},
-            action,
+            tool_input,
             verbose=verbose,
             color=start_color,
             **kwargs,
         )
         try:
-            observation = self._run(action.tool_input)
+            observation = self._run(tool_input)
         except (Exception, KeyboardInterrupt) as e:
             self.callback_manager.on_tool_error(e, verbose=verbose)
             raise e
@@ -78,7 +76,7 @@ class BaseTool(BaseModel):
 
     async def arun(
         self,
-        action: AgentAction,
+        tool_input: str,
         verbose: Optional[bool] = None,
         start_color: Optional[str] = "green",
         color: Optional[str] = "green",
@@ -90,7 +88,7 @@ class BaseTool(BaseModel):
         if self.callback_manager.is_async:
             await self.callback_manager.on_tool_start(
                 {"name": self.name, "description": self.description},
-                action,
+                tool_input,
                 verbose=verbose,
                 color=start_color,
                 **kwargs,
@@ -98,14 +96,14 @@ class BaseTool(BaseModel):
         else:
             self.callback_manager.on_tool_start(
                 {"name": self.name, "description": self.description},
-                action,
+                tool_input,
                 verbose=verbose,
                 color=start_color,
                 **kwargs,
             )
         try:
             # We then call the tool on the tool input to get an observation
-            observation = await self._arun(action.tool_input)
+            observation = await self._arun(tool_input)
         except (Exception, KeyboardInterrupt) as e:
             if self.callback_manager.is_async:
                 await self.callback_manager.on_tool_error(e, verbose=verbose)
@@ -121,11 +119,3 @@ class BaseTool(BaseModel):
                 observation, verbose=verbose, color=color, **kwargs
             )
         return observation
-
-
-class BaseToolkit(BaseModel):
-    """Class responsible for defining a collection of related tools."""
-
-    @abstractmethod
-    def get_tools(self) -> List[BaseTool]:
-        """Get the tools in the toolkit."""
